@@ -43,8 +43,6 @@ class App extends Component {
     }
 
     this.setState({ contacts: [{ id: nanoid(), ...newContact }, ...this.state.contacts] });
-    
-    return false;
   }
 
   deleteContact = (dataId) => {
