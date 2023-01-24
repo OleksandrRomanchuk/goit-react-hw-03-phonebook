@@ -12,15 +12,15 @@ import { ContactList } from "components/ContactList/ContactList";
 //========== styles ==========
 import { PhonebookApp, Container, Title, Wrapper } from './App.styled';
 
+const LS_KEY = 'contacts';
+
 class App extends Component {
   state = {
     contacts: [],
     filter: '',
-    LS_KEY: 'contacts',
   };
 
   componentDidMount() { 
-    const { LS_KEY } = this.state;
     const savedContacts = loadDataFromLocalSt(LS_KEY);
 
     if (savedContacts) {
@@ -29,7 +29,7 @@ class App extends Component {
   };
 
   componentDidUpdate(_, prevState) { 
-    const { contacts, LS_KEY } = this.state;
+    const { contacts } = this.state;
 
     if (prevState.contacts !== this.state.contacts) {
       saveDataToLocalSt(LS_KEY, contacts);
@@ -37,10 +37,15 @@ class App extends Component {
   };
 
   addNewContact = (newContact) => {
-    this.setState(prevState => {
-      return { contacts: [{ id: nanoid(), ...newContact }, ...this.state.contacts] }
-    });
-  };
+    if (this.checkNewContact(newContact.name)) {
+      alert(`${newContact.name} is already in contacts.`);
+      return true;
+    }
+
+    this.setState({ contacts: [{ id: nanoid(), ...newContact }, ...this.state.contacts] });
+    
+    return false;
+  }
 
   deleteContact = (dataId) => {
     this.setState((prevState) => {
@@ -49,9 +54,7 @@ class App extends Component {
   };
 
   setFilterWord = (event) => {
-    this.setState(prevState => {
-      return { filter: event.target.value.trim() }
-    });
+    this.setState({ filter: event.target.value.trim(), });
   };
 
   filteredContacts = () => {
@@ -59,6 +62,10 @@ class App extends Component {
 
     return this.state.contacts.filter(({ name }) => name.toLowerCase().includes(normalizeFilterWord))
   };
+
+  checkNewContact = (newName) => {
+    return this.state.contacts.some(({ name }) => name === newName);
+  }
   
   render() {
     const contacts = this.state.contacts;
@@ -71,7 +78,6 @@ class App extends Component {
           <Wrapper>
             <Section title="Form to add contacts">
               <ContactForm
-                contactsList={contacts}
                 getNewContactData={this.addNewContact} />
             </Section>
             

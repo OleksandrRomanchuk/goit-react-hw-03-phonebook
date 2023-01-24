@@ -5,11 +5,6 @@ import { Form, Label, Input, SubmitBtn } from './ContactForm.styled';
 
 class ContactForm extends Component {
     static propTypes = {
-        contactsList: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-        number: PropTypes.string.isRequired,
-    })),
         getNewContactData: PropTypes.func.isRequired,
     };
 
@@ -25,19 +20,10 @@ class ContactForm extends Component {
             return acc;
         }, {});
 
-        if (this.checkNewContact(newContact.name)) {
-            alert(`${newContact.name} is already in contacts.`);
-            return;
-        };
+        const result = this.props.getNewContactData(newContact);
 
-        this.props.getNewContactData(newContact);
-
-        form.reset();
+        if (!result) form.reset();
     };
-
-    checkNewContact = (newName) => {
-        return this.props.contactsList.some(({ name }) => name === newName);
-    }
 
     render() {
         return <Form onSubmit={this.onFormSubmit}>
